@@ -47,9 +47,41 @@ class Maze:
         self.__create_cells()
         self.__break_entrance_and_exit()
         self.__break_walls_r(0, 0)
+        self.__reset_visited()
 
         if seed is not None:
             random.seed(seed)
+
+    def solve(self) -> bool:
+        return self.__solve_r(0, 0)
+
+    def __solve_r(self, row: int, col: int) -> bool:
+        self.__animate()
+        self.__cells[row][col].visited = True
+
+        if self.__cells[row][col] == self.__cells[-1][-1]:
+            return True
+
+        for i in range(4):
+            adj_x = row + D_ROW[i]
+            adj_y = col + D_COL[i]
+
+            if self.__isValid(adj_x, adj_y):
+                dirn = get_direction([row, col], [adj_x, adj_y])
+                curr_cell = self.__cells[row][col]
+                next_cell = self.__cells[adj_x][adj_y]
+
+                has_path = curr_cell.has_wall(next_cell, dirn)
+
+                if has_path:
+                    curr_cell.draw_move(next_cell)
+                    next_move = self.__solve_r(adj_x, adj_y)
+
+                    if next_move:
+                        return True
+                    curr_cell.draw_move(next_cell, undo=True)
+
+        return False
 
     def __create_cells(self) -> None:
         for j in range(self.__num_cols):
@@ -88,7 +120,7 @@ class Maze:
             return
 
         self.__win.redraw()
-        time.sleep(0)
+        time.sleep(0.005)
 
     def __break_entrance_and_exit(self) -> None:
         top_left_cell = self.__cells[0][0]
@@ -96,8 +128,6 @@ class Maze:
 
         bottom_right_cell = self.__cells[-1][-1]
         bottom_right_cell.has_bottom_wall = False
-
-        self.__draw_cells()
 
     def __isValid(self, row: int, col: int) -> bool:
         if row < 0 or col < 0 or row >= NUM_ROWS or col >= NUM_COLS:
@@ -137,6 +167,11 @@ class Maze:
             curr_cell.break_wall(next_cell, get_mov_dir)
 
             self.__break_walls_r(r, c)
+
+    def __reset_visited(self) -> None:
+        for i in self.__cells:
+            for j in i:
+                j.visited = False
 
     # NOTE : The implementation below is something i attempted to do without recursion.
     # Needless to say, it sucks. I mean not totally sucks, it kinda works but kinds doesn't.

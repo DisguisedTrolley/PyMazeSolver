@@ -55,17 +55,17 @@ class Cell:
             self.__win.draw_line(line, "white")
 
     def draw_move(self, to_cell: "Cell", undo: bool = False) -> None:
-        mid_x_from = (self.__x1 + self.__x2) // 2
-        mid_y_from = (self.__y1 + self.__y2) // 2
+        mid_x_from = (self.__p1.x + self.__p2.x) // 2
+        mid_y_from = (self.__p1.y + self.__p2.y) // 2
 
-        mid_x_to = (to_cell.__x1 + to_cell.__x2) // 2
-        mid_y_to = (to_cell.__y1 + to_cell.__y2) // 2
+        mid_x_to = (to_cell.__p1.x + to_cell.__p2.x) // 2
+        mid_y_to = (to_cell.__p1.y + to_cell.__p2.y) // 2
 
         p1 = Point(mid_x_from, mid_y_from)
         p2 = Point(mid_x_to, mid_y_to)
 
         line = Line(p1, p2)
-        self.__win.draw_line(line, "white" if not undo else "gray")
+        self.__win.draw_line(line, "red" if not undo else "gray")
 
     def break_wall(self, other: "Cell", dirn: str) -> None:
         match dirn:
@@ -88,6 +88,23 @@ class Cell:
                 self.has_bottom_wall = False
                 other.has_top_wall = False
                 return
+
+            case _:
+                return None
+
+    def has_wall(self, other: "Cell", dirn: str) -> None:
+        match dirn:
+            case "left":
+                return not self.has_left_wall and not other.has_right_wall
+
+            case "right":
+                return not self.has_right_wall and not other.has_left_wall
+
+            case "top":
+                return not self.has_top_wall and not other.has_bottom_wall
+
+            case "bottom":
+                return not self.has_bottom_wall and not other.has_top_wall
 
             case _:
                 return None

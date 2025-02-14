@@ -15,7 +15,14 @@ def main():
 
     win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    Maze(MARGIN, MARGIN, NUM_ROWS, NUM_COLS, cell_size_x, cell_size_y, win, 42)
+    maze = Maze(MARGIN, MARGIN, NUM_ROWS, NUM_COLS, cell_size_x, cell_size_y, win, 42)
+    soln = maze.solve()
+
+    if soln:
+        print("SOLVED")
+
+    else:
+        print("COULDN'T SOLVE")
 
     win.wait_for_close()
 
