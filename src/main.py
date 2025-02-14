@@ -1,14 +1,21 @@
-from graphics import Line, Point, Window
+from constants import (
+    MARGIN,
+    NUM_COLS,
+    NUM_ROWS,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+)
+from graphics import Window
+from maze import Maze
 
 
 def main():
-    win = Window(800, 600)
+    cell_size_x = (SCREEN_WIDTH - 2 * MARGIN) // NUM_COLS
+    cell_size_y = (SCREEN_HEIGHT - 2 * MARGIN) // NUM_ROWS
 
-    p1 = Point(1, 100)
-    p2 = Point(200, 100)
+    win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    line = Line(p1, p2)
-    win.draw_line(line, "black")
+    Maze(MARGIN, MARGIN, NUM_ROWS, NUM_COLS, cell_size_x, cell_size_y, win)
 
     win.wait_for_close()
 

@@ -47,6 +47,7 @@ class Maze:
 
             self.__cells.append(row)
         self.__draw_cells()
+        self.__break_entrance_and_exit()
         return
 
     def __draw_cells(self) -> None:
@@ -64,3 +65,12 @@ class Maze:
 
         self.__win.redraw()
         time.sleep(0.05)
+
+    def __break_entrance_and_exit(self) -> None:
+        top_left_cell = self.__cells[0][0]
+        top_left_cell.has_top_wall = False
+
+        bottom_right_cell = self.__cells[-1][-1]
+        bottom_right_cell.has_bottom_wall = False
+
+        self.__draw_cells()
