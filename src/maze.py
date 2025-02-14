@@ -6,18 +6,21 @@ from constants import D_COL, D_ROW, NUM_COLS, NUM_ROWS
 from graphics import Point, Window
 
 
-def get_direction(x) -> str | None:
-    match x:
-        case 0:
-            return "right"
-        case 1:
-            return "left"
-        case 2:
-            return "bottom"
-        case 3:
-            return "top"
-        case _:
-            raise ValueError(f"Invalid value {x}")
+def get_direction(x: list[int, int], y: list[int, int]) -> str:
+    x1 = x[0]
+    x2 = y[0]
+    y1 = x[1]
+    y2 = y[1]
+
+    if x2 - x1 == 1:
+        return "bottom"
+    elif x2 - x1 == -1:
+        return "top"
+
+    if y2 - y1 == 1:
+        return "right"
+    elif y2 - y1 == -1:
+        return "left"
 
 
 class Maze:
@@ -42,6 +45,7 @@ class Maze:
         self.__cells: list[list[Cell]] = []
 
         self.__create_cells()
+        self.__break_entrance_and_exit()
         self.__break_walls_r(0, 0)
 
         if seed is not None:
@@ -84,7 +88,7 @@ class Maze:
             return
 
         self.__win.redraw()
-        time.sleep(0.05)
+        time.sleep(0)
 
     def __break_entrance_and_exit(self) -> None:
         top_left_cell = self.__cells[0][0]
@@ -105,26 +109,73 @@ class Maze:
         return True
 
     def __break_walls_r(self, row: int, col: int) -> None:
-        directions: list[list[int, int]] = []
-        directions.append([row, col])
+        self.__cells[row][col].visited = True
 
-        while len(directions) > 0:
-            current = directions.pop()
-            row = current[0]
-            col = current[1]
+        while True:
+            dirns: list[list[int, int]] = []
 
-            if not self.__isValid(row, col):
-                continue
-
-            self.__cells[row][col].visited = True
-            self.__cells[row][col].has_right_wall = False
-            self.__cells[row][col].draw(self.__win)
-
-            all_dirns = []
             for i in range(4):
-                adj_x = row + D_ROW[i]
-                adj_y = col + D_COL[i]
-                all_dirns.append([adj_x, adj_y])
+                dir_x = row + D_ROW[i]
+                dir_y = col + D_COL[i]
 
-            random.shuffle(all_dirns)
-            directions.extend(all_dirns)
+                if self.__isValid(dir_x, dir_y):
+                    dirns.append([dir_x, dir_y])
+
+            if len(dirns) == 0:
+                self.__cells[row][col].draw(self.__win)
+                return
+
+            rand_index = random.randint(0, len(dirns) - 1)
+            new_dirn = dirns[rand_index]
+
+            r = new_dirn[0]
+            c = new_dirn[1]
+            get_mov_dir = get_direction([row, col], [r, c])
+            curr_cell = self.__cells[row][col]
+            next_cell = self.__cells[r][c]
+
+            curr_cell.break_wall(next_cell, get_mov_dir)
+
+            self.__break_walls_r(r, c)
+
+    # NOTE : The implementation below is something i attempted to do without recursion.
+    # Needless to say, it sucks. I mean not totally sucks, it kinda works but kinds doesn't.
+    # I'll figure it out some day. For now, the above code works good enough.
+
+    # def __break_walls_r(self, row: int, col: int) -> None:
+    #     directions: list[list[int, int]] = []
+    #     directions.append([row, col])
+    #     prev: list[int, int] = []
+    #
+    #     while len(directions) > 0:
+    #         current = directions.pop()
+    #
+    #         row = current[0]
+    #         col = current[1]
+    #
+    #         if not self.__isValid(row, col):
+    #             continue
+    #
+    #         self.__cells[row][col].visited = True
+    #
+    #         if prev:
+    #             # print(f"PREV: {prev}, CURR: {[row, col]}")
+    #             dirn = get_direction(prev, [row, col])
+    #             # print(f"DIRN: {dirn}")
+    #             # print("\n")
+    #             prev_cell = self.__cells[prev[0]][prev[1]]
+    #             curr_cell = self.__cells[row][col]
+    #
+    #             prev_cell.break_wall(curr_cell, dirn)
+    #
+    #         self.__cells[row][col].draw(self.__win)
+    #
+    #         all_dirns = []
+    #         for i in range(4):
+    #             adj_x = row + D_ROW[i]
+    #             adj_y = col + D_COL[i]
+    #             all_dirns.append([adj_x, adj_y])
+    #
+    #         random.shuffle(all_dirns)
+    #         directions.extend(all_dirns)
+    #         prev = [row, col]

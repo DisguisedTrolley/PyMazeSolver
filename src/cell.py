@@ -31,28 +31,28 @@ class Cell:
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_left, bottom_left)
-            self.__win.draw_line(line, "red")
+            self.__win.draw_line(line, "white")
 
         if self.has_right_wall:
             line = Line(top_right, bottom_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_right, bottom_right)
-            self.__win.draw_line(line, "red")
+            self.__win.draw_line(line, "white")
 
         if self.has_bottom_wall:
             line = Line(bottom_left, bottom_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(bottom_left, bottom_right)
-            self.__win.draw_line(line, "red")
+            self.__win.draw_line(line, "white")
 
         if self.has_top_wall:
             line = Line(top_left, top_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_left, top_right)
-            self.__win.draw_line(line, "red")
+            self.__win.draw_line(line, "white")
 
     def draw_move(self, to_cell: "Cell", undo: bool = False) -> None:
         mid_x_from = (self.__x1 + self.__x2) // 2
@@ -65,7 +65,7 @@ class Cell:
         p2 = Point(mid_x_to, mid_y_to)
 
         line = Line(p1, p2)
-        self.__win.draw_line(line, "red" if not undo else "gray")
+        self.__win.draw_line(line, "white" if not undo else "gray")
 
     def break_wall(self, other: "Cell", dirn: str) -> None:
         match dirn:
