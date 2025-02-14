@@ -3,3 +3,5 @@ SCREEN_HEIGHT = 800
 NUM_ROWS = 10
 NUM_COLS = 10
 MARGIN = 50
+D_ROW = [0, 0, -1, 1]
+D_COL = [1, -1, 0, 0]

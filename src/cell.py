@@ -11,6 +11,7 @@ class Cell:
         self.has_right_wall: bool = True
         self.has_top_wall: bool = True
         self.has_bottom_wall: bool = True
+        self.visited: bool = False
         self.__win: Window = None
         self.__p1: Point = p1
         self.__p2: Point = p2
@@ -30,28 +31,28 @@ class Cell:
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_left, bottom_left)
-            self.__win.draw_line(line, "white")
+            self.__win.draw_line(line, "red")
 
         if self.has_right_wall:
             line = Line(top_right, bottom_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_right, bottom_right)
-            self.__win.draw_line(line, "white")
+            self.__win.draw_line(line, "red")
 
         if self.has_bottom_wall:
             line = Line(bottom_left, bottom_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(bottom_left, bottom_right)
-            self.__win.draw_line(line, "white")
+            self.__win.draw_line(line, "red")
 
         if self.has_top_wall:
             line = Line(top_left, top_right)
             self.__win.draw_line(line, "black")
         else:
             line = Line(top_left, top_right)
-            self.__win.draw_line(line, "white")
+            self.__win.draw_line(line, "red")
 
     def draw_move(self, to_cell: "Cell", undo: bool = False) -> None:
         mid_x_from = (self.__x1 + self.__x2) // 2
@@ -65,3 +66,28 @@ class Cell:
 
         line = Line(p1, p2)
         self.__win.draw_line(line, "red" if not undo else "gray")
+
+    def break_wall(self, other: "Cell", dirn: str) -> None:
+        match dirn:
+            case "left":
+                self.has_left_wall = False
+                other.has_right_wall = False
+                return
+
+            case "right":
+                self.has_right_wall = False
+                other.has_left_wall = False
+                return
+
+            case "top":
+                self.has_top_wall = False
+                other.has_bottom_wall = False
+                return
+
+            case "bottom":
+                self.has_bottom_wall = False
+                other.has_top_wall = False
+                return
+
+            case _:
+                return None

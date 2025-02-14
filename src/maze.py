@@ -1,7 +1,23 @@
+import random
 import time
 
 from cell import Cell
+from constants import D_COL, D_ROW, NUM_COLS, NUM_ROWS
 from graphics import Point, Window
+
+
+def get_direction(x) -> str | None:
+    match x:
+        case 0:
+            return "right"
+        case 1:
+            return "left"
+        case 2:
+            return "bottom"
+        case 3:
+            return "top"
+        case _:
+            raise ValueError(f"Invalid value {x}")
 
 
 class Maze:
@@ -14,6 +30,7 @@ class Maze:
         cell_size_x: int,
         cell_size_y: int,
         win: Window,
+        seed: int | None = None,
     ) -> None:
         self.__x1 = x1
         self.__y1 = y1
@@ -25,6 +42,10 @@ class Maze:
         self.__cells: list[list[Cell]] = []
 
         self.__create_cells()
+        self.__break_walls_r(0, 0)
+
+        if seed is not None:
+            random.seed(seed)
 
     def __create_cells(self) -> None:
         for j in range(self.__num_cols):
@@ -47,7 +68,6 @@ class Maze:
 
             self.__cells.append(row)
         self.__draw_cells()
-        self.__break_entrance_and_exit()
         return
 
     def __draw_cells(self) -> None:
@@ -74,3 +94,37 @@ class Maze:
         bottom_right_cell.has_bottom_wall = False
 
         self.__draw_cells()
+
+    def __isValid(self, row: int, col: int) -> bool:
+        if row < 0 or col < 0 or row >= NUM_ROWS or col >= NUM_COLS:
+            return False
+
+        if self.__cells[row][col].visited:
+            return False
+
+        return True
+
+    def __break_walls_r(self, row: int, col: int) -> None:
+        directions: list[list[int, int]] = []
+        directions.append([row, col])
+
+        while len(directions) > 0:
+            current = directions.pop()
+            row = current[0]
+            col = current[1]
+
+            if not self.__isValid(row, col):
+                continue
+
+            self.__cells[row][col].visited = True
+            self.__cells[row][col].has_right_wall = False
+            self.__cells[row][col].draw(self.__win)
+
+            all_dirns = []
+            for i in range(4):
+                adj_x = row + D_ROW[i]
+                adj_y = col + D_COL[i]
+                all_dirns.append([adj_x, adj_y])
+
+            random.shuffle(all_dirns)
+            directions.extend(all_dirns)
